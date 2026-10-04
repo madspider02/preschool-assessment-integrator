@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>幼兒特殊教育評量整合工具</title>
+<style>
+  :root{
+    --ink:#183a3d;
+    --muted:#60777a;
+    --line:#d7e1e2;
+    --soft:#f5f8f8;
+    --panel:#ffffff;
+    --accent:#2f7478;
+    --warn:#8a5a00;
+    --warnbg:#fff7df;
+    --ok:#265f3f;
+    --okbg:#edf8f1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;color:#203033;background:#eef3f3;line-height:1.55}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 80px}
+  header{background:linear-gradient(135deg,#fff,#f6fbfb);border:1px solid var(--line);border-radius:18px;padding:24px 28px;margin-bottom:18px}
+  h1{margin:0 0 6px;color:var(--ink);font-size:30px}
+  h2{margin:0 0 14px;color:var(--ink);font-size:22px}
+  h3{margin:18px 0 10px;color:var(--ink);font-size:18px}
+  p{margin:6px 0}
+  .note{font-size:14px;color:var(--muted)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;box-shadow:0 5px 18px rgba(40,70,72,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px}
+  label{display:block;font-weight:700;font-size:14px;color:#2d484b;margin-bottom:6px}
+  input,select,textarea{width:100%;border:1px solid #bccbcd;border-radius:10px;padding:10px 11px;font:inherit;background:#fff;color:#203033}
+  input:focus,select:focus,textarea:focus{outline:2px solid rgba(47,116,120,.18);border-color:var(--accent)}
+  textarea{min-height:92px;resize:vertical}
+  .readonly{background:#f2f6f6}
+  .req::after{content:" *";color:#b34040}
+  table{border-collapse:collapse;width:100%;margin:10px 0 6px;background:#fff}
+  th,td{border:1px solid var(--line);padding:9px 8px;text-align:center;vertical-align:middle}
+  th{background:#edf4f4;color:#24494c;font-weight:800}
+  td:first-child,th:first-child{text-align:left}
+  table input{min-width:78px;text-align:center;padding:8px}
+  .scroll{overflow-x:auto}
+  .avg{font-weight:800;background:#fbfdfd}
+  .status{border-radius:10px;padding:12px 14px;font-weight:800;margin-top:10px}
+  .status.ok{background:var(--okbg);color:var(--ok);border:1px solid #bfdfca}
+  .status.warn{background:var(--warnbg);color:var(--warn);border:1px solid #ecd799}
+  .status.neutral{background:#f2f5f5;color:#5d6e70;border:1px solid var(--line)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  button{border:0;border-radius:11px;padding:11px 16px;font:inherit;font-weight:800;cursor:pointer}
+  .primary{background:var(--accent);color:#fff}
+  .secondary{background:#e9efef;color:#29484b}
+  .danger{background:#f7eded;color:#7e3333}
+  .chartbox{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+  .charttitle{font-size:14px;font-weight:800;color:#35575a;margin-bottom:6px}
+  svg{max-width:100%;height:auto;display:block}
+  .report{display:none}
+  .report.show{display:block}
+  .report-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;border-bottom:3px solid var(--accent);padding-bottom:12px;margin-bottom:16px}
+  .report-title{font-size:27px;font-weight:900;color:var(--ink)}
+  .meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 14px;font-size:14px}
+  .meta div{padding:6px 8px;background:#f6f9f9;border-radius:8px}
+  .report table{font-size:13px}
+  .pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#edf4f4;color:#2d5659;font-size:12px;font-weight:800}
+  .footer-note{margin-top:18px;padding:10px 12px;border-top:1px solid var(--line);font-size:12px;color:#66787a}
+  .charcount{font-size:12px;color:#6b7d7f;text-align:right;margin-top:4px}
+
+  .zone-badge{display:inline-block;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:800}
+  .zone-full{background:#fff;border:1px solid #aebbbc;color:#355052}
+  .zone-partial{background:#e8ecec;border:1px solid #c4cdce;color:#44595b}
+  .zone-abnormal{background:#b6baba;border:1px solid #979c9d;color:#172426}
+  .hpa-domain-result{font-weight:800}
+  .refimg{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  details.ref{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fafcfc}
+  details.ref summary{cursor:pointer;font-weight:800;color:#2d5659}
+  .mini{font-size:12px;color:#6a7c7e}
+  .inline-radio{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .inline-radio label{font-weight:600;margin:0;display:flex;gap:6px;align-items:center}
+  .inline-radio input{width:auto}
+  .hidden{display:none!important}
+  .designer{margin-top:10px;font-size:13px;font-weight:800;color:#35575a}
+  .needs-id-review td{background:#fff8e6}
+  .review-tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#fff0c2;color:#7a5100;border:1px solid #e3c76e;font-size:12px;font-weight:800}
+  .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 14px;margin-top:8px}
+  .check-item{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fafcfc}
+  .check-item input{width:auto;margin-top:3px}
+  .check-item label{margin:0;font-weight:600}
+  .integration-note{background:#f3f8f8;border-left:4px solid var(--accent);padding:10px 12px;border-radius:8px;color:#3b5558;font-size:13px}
+  @media(max-width:800px){.grid,.grid3,.meta,.check-grid{grid-template-columns:1fr}.wrap{padding:14px 10px 50px}h1{font-size:25px}}
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    header,.input-area,.screen-only{display:none!important}
+    .report{display:block!important;border:0;box-shadow:none;padding:0;margin:0}
+    .panel{box-shadow:none;border:0;padding:0}
+    @page{size:A4;margin:12mm}
+    .report{font-size:11.5px}
+    .report-title{font-size:22px}
+    .report table{font-size:10.5px}
+    .chartbox{break-inside:avoid}
+    h2,h3{break-after:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="screen-only">
+    <h1>幼兒特殊教育評量整合工具</h1>
+    <p>協助彙整幼兒背景資料、國民健康署兒童發展篩檢、社會適應表現檢核表、ASQ:SE-2-TC，以及臺北市發展里程檢核結果，並產生可列印的整合摘要。</p>
+    <p class="note">請完成各項評量資料後產生整合報告，確認內容無誤即可送出。請勿輸入幼兒真實姓名、身分證字號或園所名稱。正式判讀仍應依各工具正式手冊及授權規範辦理。</p>
+    <p class="designer">設計者：國家教育研究院黃彥融副研究員</p>
+  </header>
+
+  <div class="input-area">
+    <section class="panel">
+      <h2>基本資料</h2>
+      <div class="grid">
+        <div><label class="req">1. 個案暱稱</label><input id="nickname" maxlength="30" placeholder="例如：小安" /></div>
+        <div><label class="req">2. 評量者</label><input id="assessor" maxlength="30" /></div>
+        <div><label class="req">3. 評量日期</label><input id="assessDate" type="date" /></div>
+        <div><label class="req">出生日期（僅供換算，不呈現在報告）</label><input id="birthDate" type="date" /></div>
+        <div><label>4. 實足月齡</label><input id="ageDisplay" class="readonly" readonly placeholder="將自動換算，例如 57 個月（4歲9月0日）" /></div>
+        <div><label class="req">5. 性別</label><select id="sex"><option value="">請選擇</option><option>男</option><option>女</option></select></div>
+        <div><label class="req">6. 就讀年段</label><select id="grade"><option value="">請選擇</option><option>幼兒園中班</option><option>幼兒園大班</option><option>其他</option></select><div id="gradeOtherWrap" class="hidden" style="margin-top:8px"><input id="gradeOther" maxlength="40" placeholder="請填寫其他就讀年段，例如：幼兒園小班" /></div></div>
+        <div><label class="req">7. 教師熟悉幼兒時間</label><div style="display:flex;gap:8px"><input id="familiarNum" type="number" min="0" step="1" placeholder="例如 8" /><select id="familiarUnit" style="max-width:110px"><option>週</option><option>月</option><option>年</option></select></div></div>
+        <div><label class="req">8. 是否接受早療／特教服務</label><select id="service"><option value="">請選擇</option><option>否</option><option>接受早療服務</option><option>接受特殊教育服務</option><option>兩者皆有</option></select></div>
+        <div style="grid-column:1/-1"><label class="req">9. 評量原因或目前主要關切（至少10字）</label><textarea id="concern" minlength="10" maxlength="300" placeholder="請簡要說明目前最關切的發展、學習、適應或社會情緒表現。"></textarea><div class="charcount"><span id="concernCount">0</span>/300</div></div>
+      </div>
+    </section>
+
+
+    <section class="panel">
+      <h2>A. 國民健康署兒童發展篩檢量表</h2>
+      <p class="note">依你提供的 4–5 歲與 5–7 歲「評估結果量表／分數對照表」設定。系統會依實足月齡自動建議版本，也可手動調整。四個發展面向得分皆為必填，各發展面向會依切截分數判定「滿分／通過但未達滿分／異常」，並形成整體評估結果。</p>
+      <div class="grid3">
+        <div>
+          <label class="req">使用版本</label>
+          <select id="hpaVersion" required>
+            <option value="">請選擇</option>
+            <option value="4-5">4–5 歲</option>
+            <option value="5-7">5–7 歲</option>
+          </select>
+          <div id="hpaAgeHint" class="mini"></div>
+        </div>
+        <div>
+          <label>整體評估結果</label>
+          <div id="hpaOverall" class="status neutral">請先選擇版本並輸入四個發展面向分數。</div>
+        </div>
+        <div>
+          <label>治療／追蹤建議</label>
+          <select id="hpaRecommendation">
+            <option value="">請依正式表單與專業判斷選擇</option>
+            <option>定期追蹤</option>
+            <option>回診追蹤</option>
+            <option>需轉介</option>
+          </select>
+          <div class="mini">此欄不由系統自動推定。</div>
+        </div>
+      </div>
+      <div class="scroll" style="margin-top:12px">
+        <table id="hpaTable">
+          <thead><tr><th>發展面向</th><th>得分</th><th>切截分數</th><th>最高分</th><th>結果</th></tr></thead>
+          <tbody>
+            <tr><td>粗大動作</td><td><input id="hpaGross" type="number" required></td><td id="hpaGrossCut">—</td><td id="hpaGrossMax">—</td><td id="hpaGrossResult">—</td></tr>
+            <tr><td>精細動作</td><td><input id="hpaFine" type="number" required></td><td id="hpaFineCut">—</td><td id="hpaFineMax">—</td><td id="hpaFineResult">—</td></tr>
+            <tr><td>認知語言</td><td><input id="hpaCog" type="number" required></td><td id="hpaCogCut">—</td><td id="hpaCogMax">—</td><td id="hpaCogResult">—</td></tr>
+            <tr><td>社會發展</td><td><input id="hpaSocial" type="number" required></td><td id="hpaSocialCut">—</td><td id="hpaSocialMax">—</td><td id="hpaSocialResult">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mini">整體評估類別依你提供的表單：全部發展面向均達滿分（白色區）；任一發展面向通過但未達滿分（淺灰色區）；任一發展面向異常（深灰色區）。</p>
+    </section>
+
+    <section class="panel">
+      <h2>B. 社會適應表現檢核表</h2>
+      <h3>1. 一般學生常模</h3>
+      <p class="note">請依正式手冊完成計分後，輸入五個向度的組合分數、標準分數與百分等級；本區所有分數欄位皆為必填。折線圖以「標準分數」呈現五向度剖面，其他分數保留於表格。</p>
+      <div class="scroll">
+        <table id="generalNormTable">
+          <thead><tr><th>向度</th><th>組合分數</th><th>標準分數</th><th>百分等級</th><th>提示</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="generalNormAlert" class="status neutral">輸入標準分數與百分等級後，系統會檢查是否需要進一步檢視智能障礙學生常模。</div>
+      <div class="chartbox"><div class="charttitle">一般學生常模五向度標準分數剖面</div><div id="generalChart"></div></div>
+
+      <h3>2. 智能障礙學生常模</h3>
+      <p class="note">請輸入12個分量表的「量表分數」；12個量表分數皆為必填。原始分數請保留於正式作答／計分資料中，不需在本工具重複輸入。系統將自動計算五個向度平均數。</p>
+      <div class="scroll">
+        <table id="idNormTable">
+          <thead><tr><th>分量表</th><th>量表分數</th><th>所屬向度</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="scroll">
+        <table id="avgTable">
+          <thead><tr><th>五個向度</th><th>平均量表分數</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="chartbox"><div class="charttitle">智能障礙學生常模五向度平均量表分數</div><div id="idChart"></div></div>
+    </section>
+
+    <section class="panel">
+      <h2>C. ASQ:SE-2-TC</h2>
+      <p class="note">切截分數依你提供的「ASQ:SE-2 繁體中文版切截分數」表設定。正式研究與臨床／教育判讀仍應以正式中文版手冊為準。</p>
+      <div class="grid3">
+        <div><label class="req">使用年齡層版本</label><select id="asqAge" required><option value="">請選擇</option><option value="2">2個月</option><option value="6">6個月</option><option value="18">18個月</option><option value="24">24個月</option><option value="30">30個月</option><option value="36">36個月</option><option value="48">48個月</option><option value="60">60個月</option></select></div>
+        <div><label class="req">ASQ:SE-2-TC 總分</label><input id="asqScore" type="number" min="0" step="1" required /></div>
+        <div><label>中文版切截分數</label><input id="asqCutoff" class="readonly" readonly /></div>
+      </div>
+      <div id="asqStatus" class="status neutral">請先選擇年齡層版本並輸入總分。</div>
+      <div class="scroll" style="margin-top:12px">
+        <table>
+          <thead><tr><th>年齡層（月）</th><th>中文版切截分數</th></tr></thead>
+          <tbody><tr><td>2</td><td>45</td></tr><tr><td>6</td><td>55</td></tr><tr><td>18</td><td>75</td></tr><tr><td>24</td><td>75</td></tr><tr><td>30</td><td>100</td></tr><tr><td>36</td><td>110</td></tr><tr><td>48</td><td>90</td></tr><tr><td>60</td><td>110</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="panel">
+      <h2>D. 臺北市學前兒童發展里程檢核（補充）</h2>
+      <p class="note">此區將你提供的臺北市 4 歲與 5 歲發展里程檢核表放入網站，作為課程補充。系統不重新改寫原表題目，而是保留原始表單影像，並依表單下方的判讀規則協助彙整結果。</p>
+      <div class="grid">
+        <div>
+          <label>建議使用版本</label>
+          <select id="tpVersion">
+            <option value="">請選擇</option>
+            <option value="4">4 歲（3歲11個月16天－4歲11個月15天）</option>
+            <option value="5">5 歲（4歲11個月16天－5歲11個月15天）</option>
+          </select>
+          <div id="tpAgeHint" class="mini"></div>
+        </div>
+        <div>
+          <label>檢核結果</label>
+          <div id="tpStatus" class="status neutral">請依原表完成檢核後，輸入下方三項摘要。</div>
+        </div>
+      </div>
+      <div class="grid3" style="margin-top:12px">
+        <div><label>落在網底欄的答案題數</label><input id="tpShadedCount" type="number" min="0" max="13" step="1" placeholder="0–13"></div>
+        <div>
+          <label>是否有任何 ★ 題答案落在網底欄</label>
+          <select id="tpStarHit"><option value="">請選擇</option><option value="no">否</option><option value="yes">是</option></select>
+        </div>
+        <div>
+          <label>填寫人是否認為有其他不尋常功能或行為表現</label>
+          <select id="tpOtherConcern"><option value="">請選擇</option><option value="no">否</option><option value="yes">是</option></select>
+        </div>
+      </div>
+      <p class="mini">依你提供的表單說明：若有 2 題以上答案落在網底欄，或任一 ★ 題答案落在網底欄，或填寫人認為兒童有其他不尋常的功能或行為表現，建議至表單所列醫療院所做進一步檢查；若均未符合上述情形，表示通過此階段檢測，仍應持續追蹤發展情形。</p>
+      <details class="ref" id="tp4Details"><summary>查看臺北市 4 歲發展里程檢核表</summary><img class="refimg" alt="臺北市4歲發展里程檢核表" src="assets/taipei_age4.png"></details>
+      <details class="ref" id="tp5Details"><summary>查看臺北市 5 歲發展里程檢核表</summary><img class="refimg" alt="臺北市5歲發展里程檢核表" src="assets/taipei_age5.png"></details>
+    </section>
+
+    <section class="panel">
+      <h2>E. 綜合評量與專業判斷</h2>
+      <p class="integration-note">以下內容由評量者依前述資料自行整合與判斷，系統不會自動替幼兒下診斷或產生教育結論。請以評量證據為基礎，說明不同資料來源的一致與不一致，並提出後續需要補充的資訊與支持建議。</p>
+
+      <h3>三、跨評量整合</h3>
+      <label class="req">請整合國民健康署兒童發展篩檢、社會適應表現檢核表、ASQ:SE-2-TC，必要時納入臺北市發展里程檢核之補充資料</label>
+      <textarea id="integration" placeholder="例如：哪些結果彼此一致？哪些結果不一致？不同情境、評量方法或資訊提供者是否可能造成差異？"></textarea>
+
+      <h3>四、幼兒優勢與教育需求</h3>
+      <div class="grid">
+        <div>
+          <label class="req">幼兒優勢（至少10字）</label>
+          <textarea id="strengths" minlength="10" maxlength="600" placeholder="請根據評量資料描述幼兒目前較具優勢或已穩定展現的能力。"></textarea>
+          <div class="charcount"><span id="strengthsCount">0</span>/600</div>
+        </div>
+        <div>
+          <label class="req">教育需求（至少10字）</label>
+          <textarea id="needs" minlength="10" maxlength="600" placeholder="請描述目前需要支持、調整、教學或進一步評估的主要面向。"></textarea>
+          <div class="charcount"><span id="needsCount">0</span>/600</div>
+        </div>
+      </div>
+
+      <h3>五、尚需蒐集之資料</h3>
+      <p class="note">可複選。請選擇目前仍需補充的資料來源；若認為目前暫無需補充資料，請勾選「目前暫無需補充資料」。</p>
+      <div class="check-grid" id="moreDataGrid">
+        <div class="check-item"><input type="checkbox" id="more_observation" value="自然情境直接觀察"><label for="more_observation">自然情境直接觀察</label></div>
+        <div class="check-item"><input type="checkbox" id="more_parent" value="家長／主要照顧者進一步訪談"><label for="more_parent">家長／主要照顧者進一步訪談</label></div>
+        <div class="check-item"><input type="checkbox" id="more_language" value="語言與溝通評估"><label for="more_language">語言與溝通評估</label></div>
+        <div class="check-item"><input type="checkbox" id="more_cognitive" value="認知／智力評估"><label for="more_cognitive">認知／智力評估</label></div>
+        <div class="check-item"><input type="checkbox" id="more_motor" value="動作／感覺處理相關專業評估"><label for="more_motor">動作／感覺處理相關專業評估</label></div>
+        <div class="check-item"><input type="checkbox" id="more_behavior" value="情緒行為／功能性行為評量"><label for="more_behavior">情緒行為／功能性行為評量</label></div>
+        <div class="check-item"><input type="checkbox" id="more_medical" value="醫療／發展評估"><label for="more_medical">醫療／發展評估</label></div>
+        <div class="check-item"><input type="checkbox" id="more_team" value="跨專業團隊資料"><label for="more_team">跨專業團隊資料</label></div>
+        <div class="check-item"><input type="checkbox" id="more_none" value="目前暫無需補充資料"><label for="more_none">目前暫無需補充資料</label></div>
+        <div class="check-item"><input type="checkbox" id="more_other" value="其他"><label for="more_other">其他</label></div>
+      </div>
+      <div id="moreOtherWrap" class="hidden" style="margin-top:10px"><label>其他尚需蒐集之資料</label><input id="moreOtherText" maxlength="150" placeholder="請填寫其他資料需求"></div>
+
+      <h3>六、後續建議</h3>
+      <label class="req">請提出後續追蹤、教學支持、家庭合作、轉介或其他建議（至少10字）</label>
+      <textarea id="recommendations" minlength="10" maxlength="800" placeholder="請依目前資料提出具體且可執行的後續建議。"></textarea>
+      <div class="charcount"><span id="recommendationsCount">0</span>/800</div>
+    </section>
+
+    <div class="actions">
+      <button class="primary" id="generateBtn" type="button">產生／更新整合報告</button>
+      <button class="danger" id="resetBtn" type="button">清除全部資料</button>
+    </div>
+  </div>
+
+  <section id="report" class="panel report">
+    <div class="report-header">
+      <div>
+        <div class="report-title">幼兒特殊教育評量整合摘要</div>
+        <div class="note">本摘要用於課程學習與多元資料整合，不取代正式鑑定、診斷或專業判斷。</div>
+      </div>
+      <span class="pill">整合摘要</span>
+    </div>
+    <div id="reportControls" class="screen-only" style="margin:14px 0 18px">
+      <div class="integration-note">請先檢查下方整合報告內容。確認無誤後，可直接列印／另存 PDF，或送出本次評量資料。</div>
+      <div class="actions">
+        <button class="secondary" id="reportPrintBtn" type="button">列印／另存 PDF</button>
+        <button class="primary" id="reportSubmitBtn" type="button">確認無誤，送出資料</button>
+      </div>
+      <div id="reportSubmitStatus" class="status neutral" style="display:none"></div>
+    </div>
+    <div id="reportSubmission" class="status neutral" style="display:none"></div>
+    <div id="reportBody"></div>
+    <div class="footer-note">國民健康署兒童發展篩檢切截分數、ASQ:SE-2-TC 切截分數與臺北市發展里程檢核判讀規則，均依本課程提供之表單設定。<br><b>設計者：國家教育研究院黃彥融副研究員</b></div>
+  </section>
+</div>
+<script>
+const domains = ["生活自理","動作與行動能力","語言與溝通","社會人際與情緒行為","學科(領域)學習表現"];
+const subscales = [
+  ["飲食","生活自理"],["穿著","生活自理"],["衛生安全","生活自理"],
+  ["動作","動作與行動能力"],["行動","動作與行動能力"],
+  ["語言","語言與溝通"],["溝通","語言與溝通"],
+  ["社會人際","社會人際與情緒行為"],["情緒行為","社會人際與情緒行為"],
+  ["語文","學科(領域)學習表現"],["數學","學科(領域)學習表現"],["綜合應用","學科(領域)學習表現"]
+];
+const cutoffs = {2:45,6:55,18:75,24:75,30:100,36:110,48:90,60:110};
+const SUBMIT_ENDPOINT = "https://script.google.com/macros/s/AKfycbyElmAClP2T2Q5-jZcXNC8mxM58CwqIN3dcN4ZJc7h59j5xko_CueeNR-yWXLJyVBPH5Q/exec";
+let currentSubmissionId = "";
+let submitted = false;
+
+const hpaRules = {
+  "4-5": {
+    label:"4–5 歲",
+    gross:{cutoff:4,max:5,step:1},
+    fine:{cutoff:3,max:4,step:1},
+    cog:{cutoff:4,max:5,step:1},
+    social:{cutoff:4,max:5,step:1}
+  },
+  "5-7": {
+    label:"5–7 歲",
+    gross:{cutoff:3,max:4,step:1},
+    fine:{cutoff:4,max:5,step:1},
+    cog:{cutoff:5,max:6,step:0.5},
+    social:{cutoff:4,max:6,step:1}
+  }
+};
+
+function el(id){return document.getElementById(id)}
+function esc(s){return String(s??"").replace(/[&<>\"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function numOrBlank(v){return v===""||v==null?"":Number(v)}
+function fmt(v){return v===""||v==null||Number.isNaN(Number(v))?"—":String(v)}
+function avg(arr){const vals=arr.map(Number).filter(v=>Number.isFinite(v)); return vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : null}
+
+// Build tables
+const gBody = el('generalNormTable').querySelector('tbody');
+domains.forEach((d,i)=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${d}</td><td><input class="g-composite" data-i="${i}" type="number" step="0.01" required></td><td><input class="g-standard" data-i="${i}" type="number" step="0.01" required></td><td><input class="g-percentile" data-i="${i}" type="number" min="0" max="100" step="0.1" required></td><td class="g-review" id="g-review-${i}">—</td>`;
+  gBody.appendChild(tr);
+});
+const idBody = el('idNormTable').querySelector('tbody');
+subscales.forEach(([s,d],i)=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${s}</td><td><input class="id-scale" data-i="${i}" type="number" step="0.01" required></td><td>${d}</td>`;
+  idBody.appendChild(tr);
+});
+const avgBody = el('avgTable').querySelector('tbody');
+domains.forEach((d,i)=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${d}</td><td class="avg" id="avg-${i}">—</td>`;
+  avgBody.appendChild(tr);
+});
+
+function calcAge(){
+  const b=el('birthDate').value, a=el('assessDate').value;
+  if(!b||!a){el('ageDisplay').value=''; return null}
+  let birth=new Date(b+'T12:00:00'), assess=new Date(a+'T12:00:00');
+  if(assess<birth){el('ageDisplay').value='評量日期早於出生日期'; return null}
+  let y=assess.getFullYear()-birth.getFullYear();
+  let m=assess.getMonth()-birth.getMonth();
+  let d=assess.getDate()-birth.getDate();
+  if(d<0){
+    const prevMonthDays=new Date(assess.getFullYear(), assess.getMonth(), 0).getDate();
+    d += prevMonthDays; m -= 1;
+  }
+  if(m<0){m+=12; y-=1}
+  const totalMonths=y*12+m;
+  el('ageDisplay').value=`${totalMonths} 個月（${y}歲${m}月${d}日）`;
+  autoSuggestVersions({y,m,d,totalMonths});
+  return {y,m,d,totalMonths};
+}
+el('birthDate').addEventListener('change',calcAge); el('assessDate').addEventListener('change',calcAge);
+el('concern').addEventListener('input',()=>el('concernCount').textContent=el('concern').value.length);
+
+function updateGradeOther(){
+  const isOther=el('grade').value==='其他';
+  el('gradeOtherWrap').classList.toggle('hidden',!isOther);
+  if(!isOther) el('gradeOther').value='';
+}
+function gradeLabel(){
+  if(el('grade').value==='其他'){
+    const t=el('gradeOther').value.trim();
+    return t?`其他－${t}`:'其他';
+  }
+  return el('grade').value;
+}
+el('grade').addEventListener('change',updateGradeOther);
+updateGradeOther();
+
+function getGeneral(){
+  const comps=[...document.querySelectorAll('.g-composite')].map(x=>x.value);
+  const stds=[...document.querySelectorAll('.g-standard')].map(x=>x.value);
+  const percs=[...document.querySelectorAll('.g-percentile')].map(x=>x.value);
+  return domains.map((d,i)=>({domain:d,composite:comps[i],standard:stds[i],percentile:percs[i]}));
+}
+function getGeneralReview(){
+  return getGeneral().map(x=>{
+    const s=x.standard===''?null:Number(x.standard);
+    const p=x.percentile===''?null:Number(x.percentile);
+    const reasons=[];
+    if(Number.isFinite(s) && s<=72) reasons.push(`標準分數 ${s} ≤ 72`);
+    if(Number.isFinite(p) && p<=3) reasons.push(`百分等級 ${p} ≤ 3`);
+    return {...x,needsReview:reasons.length>0,reasons};
+  });
+}
+function updateGeneralReview(){
+  const flags=getGeneralReview();
+  const rows=[...el('generalNormTable').querySelectorAll('tbody tr')];
+  flags.forEach((x,i)=>{
+    if(rows[i]) rows[i].classList.toggle('needs-id-review',x.needsReview);
+    const cell=el(`g-review-${i}`);
+    if(cell) cell.innerHTML=x.needsReview?'<span class="review-tag">需進一步檢視智能障礙學生常模</span>':'—';
+  });
+  const hits=flags.filter(x=>x.needsReview);
+  const box=el('generalNormAlert');
+  const anyEntered=flags.some(x=>x.standard!=='' || x.percentile!=='');
+  if(hits.length){
+    box.className='status warn';
+    box.innerHTML=`<b>需進一步檢視智能障礙學生常模</b><br>${hits.map(x=>`${esc(x.domain)}（${x.reasons.map(esc).join('；')}）`).join('、')}`;
+  }else if(anyEntered){
+    box.className='status ok';
+    box.textContent='目前已輸入的標準分數與百分等級未達「標準分數 ≤ 72 或百分等級 ≤ 3」之提示條件。';
+  }else{
+    box.className='status neutral';
+    box.textContent='輸入標準分數與百分等級後，系統會檢查是否需要進一步檢視智能障礙學生常模。';
+  }
+}
+function getID(){
+  const scales=[...document.querySelectorAll('.id-scale')].map(x=>x.value);
+  return subscales.map(([s,d],i)=>({subscale:s,domain:d,scale:scales[i]}));
+}
+function getAverages(){
+  const data=getID();
+  return domains.map(d=>{
+    const vals=data.filter(x=>x.domain===d).map(x=>x.scale).filter(v=>v!=="");
+    return {domain:d, value: vals.length?avg(vals):null};
+  });
+}
+function updateAverages(){
+  getAverages().forEach((x,i)=>el('avg-'+i).textContent=x.value==null?'—':x.value.toFixed(2));
+  drawCharts();
+}
+document.addEventListener('input',e=>{if(e.target.matches('.g-standard,.g-percentile,.id-scale')){updateAverages(); updateGeneralReview(); drawCharts();}});
+
+function makeLineChart(labels, values, opts={}){
+  const nums=values.map(v=>v===""||v==null||Number.isNaN(Number(v))?null:Number(v));
+  const valid=nums.filter(v=>v!=null);
+  const W=760,H=280,L=55,R=20,T=20,B=72;
+  if(!valid.length) return `<div class="note">輸入分數後將顯示折線圖。</div>`;
+  let min=Math.min(...valid), max=Math.max(...valid);
+  if(min===max){min-=1;max+=1}
+  const pad=(max-min)*.15; min-=pad; max+=pad;
+  if(opts.min!=null) min=Math.min(min,opts.min);
+  if(opts.max!=null) max=Math.max(max,opts.max);
+  const x=i=>L+(W-L-R)*(labels.length===1?.5:i/(labels.length-1));
+  const y=v=>T+(H-T-B)*(1-(v-min)/(max-min));
+  let grid='';
+  for(let k=0;k<=4;k++){
+    const val=min+(max-min)*k/4, yy=y(val);
+    grid+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#e3e9ea"/><text x="${L-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="#6b7d7f">${val.toFixed(1)}</text>`;
+  }
+  let pts='', circles='', xlabels='';
+  nums.forEach((v,i)=>{
+    xlabels+=`<text x="${x(i)}" y="${H-B+25}" text-anchor="middle" font-size="10.5" fill="#536b6e">${esc(labels[i]).replace('學科(領域)','學科')}</text>`;
+    if(v!=null){pts+=`${x(i)},${y(v)} `; circles+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#2f7478"/><text x="${x(i)}" y="${y(v)-9}" text-anchor="middle" font-size="11" font-weight="700" fill="#24494c">${v}</text>`}
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="折線圖">${grid}<line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#9fb1b3"/><polyline points="${pts.trim()}" fill="none" stroke="#2f7478" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${circles}${xlabels}</svg>`;
+}
+function drawCharts(){
+  const g=getGeneral();
+  el('generalChart').innerHTML=makeLineChart(domains,g.map(x=>x.standard));
+  const a=getAverages();
+  el('idChart').innerHTML=makeLineChart(domains,a.map(x=>x.value==null?null:Number(x.value.toFixed(2))));
+}
+drawCharts();
+
+
+function autoSuggestVersions(age){
+  if(!age) return;
+  const hpa = age.totalMonths>=48 && age.totalMonths<60 ? "4-5" : (age.totalMonths>=60 && age.totalMonths<=83 ? "5-7" : "");
+  if(hpa){
+    el('hpaVersion').value=hpa;
+    el('hpaAgeHint').textContent=`依實足月齡建議使用 ${hpaRules[hpa].label} 版本。`;
+    updateHPA();
+  }else{
+    el('hpaAgeHint').textContent='目前實足月齡不在本課程設定的 4–5 歲／5–7 歲範圍內。';
+  }
+  let tp="";
+  const in4 = (age.y===3 && age.m===11 && age.d>=16) || age.y===4 && (age.m<11 || (age.m===11 && age.d<=15));
+  const in5 = (age.y===4 && age.m===11 && age.d>=16) || age.y===5 && (age.m<11 || (age.m===11 && age.d<=15));
+  if(in4) tp="4";
+  if(in5) tp="5";
+  if(tp){
+    el('tpVersion').value=tp;
+    el('tpAgeHint').textContent=`依實足年齡建議使用臺北市 ${tp} 歲檢核表。`;
+  }else{
+    el('tpAgeHint').textContent='目前實足年齡不在這兩份臺北市 4 歲／5 歲檢核表的適用範圍內。';
+  }
+}
+
+function updateHPA(){
+  const ver=el('hpaVersion').value;
+  const fields=[
+    ['Gross','gross'],['Fine','fine'],['Cog','cog'],['Social','social']
+  ];
+  if(!ver || !hpaRules[ver]){
+    fields.forEach(([cap])=>{
+      el('hpa'+cap+'Cut').textContent='—'; el('hpa'+cap+'Max').textContent='—'; el('hpa'+cap+'Result').textContent='—';
+    });
+    el('hpaOverall').className='status neutral'; el('hpaOverall').textContent='請先選擇版本並輸入四個發展面向分數。';
+    return;
+  }
+  const rule=hpaRules[ver];
+  let complete=true, anyAbnormal=false, allFull=true;
+  fields.forEach(([cap,key])=>{
+    const inp=el('hpa'+cap), r=rule[key];
+    inp.min=0; inp.max=r.max; inp.step=r.step;
+    el('hpa'+cap+'Cut').textContent=`通過 ≥ ${r.cutoff}`;
+    el('hpa'+cap+'Max').textContent=r.max;
+    const val=inp.value;
+    let txt='—';
+    if(val===''){complete=false; allFull=false;}
+    else{
+      const n=Number(val);
+      if(n<r.cutoff){txt='異常'; anyAbnormal=true; allFull=false;}
+      else if(n>=r.max){txt='滿分';}
+      else{txt='通過，未達滿分'; allFull=false;}
+    }
+    el('hpa'+cap+'Result').innerHTML = txt==='滿分'
+      ? '<span class="zone-badge zone-full">滿分</span>'
+      : txt==='通過，未達滿分'
+        ? '<span class="zone-badge zone-partial">通過，未達滿分</span>'
+        : txt==='異常'
+          ? '<span class="zone-badge zone-abnormal">異常</span>'
+          : '—';
+  });
+  const box=el('hpaOverall');
+  if(!complete){box.className='status neutral'; box.textContent='尚未輸入完整四個發展面向分數。'; return;}
+  if(anyAbnormal){box.className='status warn'; box.textContent='任一發展面向異常（深灰色區）。';}
+  else if(allFull){box.className='status ok'; box.textContent='全部發展面向均達滿分（白色區）。';}
+  else{box.className='status neutral'; box.textContent='任一發展面向通過，但未達滿分（淺灰色區）。';}
+}
+el('hpaVersion').addEventListener('change',updateHPA);
+['hpaGross','hpaFine','hpaCog','hpaSocial'].forEach(id=>el(id).addEventListener('input',updateHPA));
+
+function updateTaipei(){
+  const count=el('tpShadedCount').value, star=el('tpStarHit').value, other=el('tpOtherConcern').value;
+  const box=el('tpStatus');
+  if(count==='' || !star || !other){box.className='status neutral';box.textContent='請依原表完成檢核後，輸入下方三項摘要。';return;}
+  const need=Number(count)>=2 || star==='yes' || other==='yes';
+  if(need){
+    box.className='status warn';
+    box.textContent='依原表判讀規則，符合需進一步檢查的條件。';
+  }else{
+    box.className='status ok';
+    box.textContent='依原表判讀規則，通過此階段檢測；仍應持續追蹤發展情形。';
+  }
+}
+['tpShadedCount','tpStarHit','tpOtherConcern'].forEach(id=>el(id).addEventListener(id==='tpShadedCount'?'input':'change',updateTaipei));
+
+function updateASQ(){
+  const age=el('asqAge').value, score=el('asqScore').value;
+  const cutoff=age?cutoffs[age]:'';
+  el('asqCutoff').value=cutoff||'';
+  const box=el('asqStatus');
+  if(!age||score===''){box.className='status neutral';box.textContent='請先選擇年齡層版本並輸入總分。';return}
+  const s=Number(score), c=Number(cutoff);
+  if(s>=c){box.className='status warn';box.textContent=`總分 ${s}，達到或高於中文版切截分數 ${c}，建議依正式手冊進一步檢視與追蹤。`;}
+  else{box.className='status ok';box.textContent=`總分 ${s}，低於中文版切截分數 ${c}。`;}
+}
+el('asqAge').addEventListener('change',updateASQ);el('asqScore').addEventListener('input',updateASQ);
+
+const professionalTextFields=[
+  ['strengths','strengthsCount'],['needs','needsCount'],['recommendations','recommendationsCount']
+];
+professionalTextFields.forEach(([id,countId])=>{
+  el(id).addEventListener('input',()=>{el(countId).textContent=el(id).value.length;});
+});
+
+const moreDataIds=['more_observation','more_parent','more_language','more_cognitive','more_motor','more_behavior','more_medical','more_team','more_none','more_other'];
+function selectedMoreData(){
+  return moreDataIds.filter(id=>el(id).checked).map(id=>{
+    if(id==='more_other'){
+      const t=el('moreOtherText').value.trim();
+      return t ? `其他：${t}` : '其他';
+    }
+    return el(id).value;
+  });
+}
+el('more_other').addEventListener('change',()=>{el('moreOtherWrap').classList.toggle('hidden',!el('more_other').checked);});
+el('more_none').addEventListener('change',()=>{
+  if(el('more_none').checked){
+    moreDataIds.filter(id=>id!=='more_none').forEach(id=>{el(id).checked=false;});
+    el('moreOtherWrap').classList.add('hidden');
+    el('moreOtherText').value='';
+  }
+});
+moreDataIds.filter(id=>id!=='more_none').forEach(id=>el(id).addEventListener('change',()=>{
+  if(el(id).checked) el('more_none').checked=false;
+}));
+
+function requireNumericFields(selector, sectionName){
+  const fields=[...document.querySelectorAll(selector)];
+  for(const field of fields){
+    if(field.value===''){
+      alert(`${sectionName}的數字欄位皆為必填，請完成後再產生報告。`);
+      field.focus();
+      return false;
+    }
+    if(!Number.isFinite(Number(field.value))){
+      alert(`${sectionName}包含無效數字，請重新確認。`);
+      field.focus();
+      return false;
+    }
+  }
+  return true;
+}
+
+function validate(){
+  const required=[['nickname','個案暱稱'],['assessor','評量者'],['assessDate','評量日期'],['birthDate','出生日期'],['sex','性別'],['grade','就讀年段'],['familiarNum','教師熟悉幼兒時間'],['service','是否接受早療／特教服務'],['concern','評量原因或目前主要關切']];
+  for(const [id,name] of required){if(!el(id).value.trim()){alert(`請填寫：${name}`);el(id).focus();return false}}
+  if(el('grade').value==='其他' && !el('gradeOther').value.trim()){alert('就讀年段選擇「其他」時，請填寫實際年段。');el('gradeOther').focus();return false}
+  if(el('concern').value.trim().length<10){alert('「評量原因或目前主要關切」至少需10個字。');el('concern').focus();return false}
+  if(!calcAge()){alert('請確認出生日期與評量日期。');return false}
+
+  if(!el('hpaVersion').value){alert('請選擇國民健康署兒童發展篩檢版本。');el('hpaVersion').focus();return false}
+  if(!requireNumericFields('#hpaTable input[type="number"]','國民健康署兒童發展篩檢')) return false;
+  const hr=hpaRules[el('hpaVersion').value];
+  const hpaChecks=[['hpaGross',hr.gross],['hpaFine',hr.fine],['hpaCog',hr.cog],['hpaSocial',hr.social]];
+  for(const [id,r] of hpaChecks){const n=Number(el(id).value); if(n<0 || n>r.max){alert(`國民健康署兒童發展篩檢分數須介於 0 與 ${r.max} 之間。`);el(id).focus();return false}}
+
+  if(!requireNumericFields('#generalNormTable tbody input','社會適應表現檢核表一般學生常模')) return false;
+  const badPerc=[...document.querySelectorAll('.g-percentile')].find(x=>Number(x.value)<0 || Number(x.value)>100);
+  if(badPerc){alert('一般學生常模的百分等級須介於 0–100。');badPerc.focus();return false}
+  if(!requireNumericFields('#idNormTable tbody input','社會適應表現檢核表智能障礙學生常模')) return false;
+
+  if(!el('asqAge').value){alert('請選擇 ASQ:SE-2-TC 使用年齡層版本。');el('asqAge').focus();return false}
+  if(el('asqScore').value===''){alert('請填寫 ASQ:SE-2-TC 總分。');el('asqScore').focus();return false}
+
+  // 臺北市發展里程檢核為補充資料；若開始填寫，則三項摘要需完整。
+  const tpAny=el('tpVersion').value || el('tpShadedCount').value!=='' || el('tpStarHit').value || el('tpOtherConcern').value;
+  if(tpAny && (!el('tpVersion').value || el('tpShadedCount').value==='' || !el('tpStarHit').value || !el('tpOtherConcern').value)){
+    alert('若使用臺北市發展里程檢核補充資料，請完整填寫版本、網底題數、★題與其他不尋常表現。');
+    return false;
+  }
+
+  if(!el('integration').value.trim()){alert('請填寫「三、跨評量整合」。');el('integration').focus();return false}
+  if(el('strengths').value.trim().length<10){alert('「幼兒優勢」至少需10個字。');el('strengths').focus();return false}
+  if(el('needs').value.trim().length<10){alert('「教育需求」至少需10個字。');el('needs').focus();return false}
+  const moreData=selectedMoreData();
+  if(moreData.length===0){alert('「五、尚需蒐集之資料」請至少選擇一項，或勾選「目前暫無需補充資料」。');return false}
+  if(el('more_other').checked && !el('moreOtherText').value.trim()){alert('勾選「其他」時，請填寫其他尚需蒐集之資料。');el('moreOtherText').focus();return false}
+  if(el('recommendations').value.trim().length<10){alert('「六、後續建議」至少需10個字。');el('recommendations').focus();return false}
+  return true;
+}
+function reportTableGeneral(g){const flags=getGeneralReview();return `<table><thead><tr><th>向度</th><th>組合分數</th><th>標準分數</th><th>百分等級</th><th>提示</th></tr></thead><tbody>${g.map((x,i)=>`<tr class="${flags[i].needsReview?'needs-id-review':''}"><td>${x.domain}</td><td>${fmt(x.composite)}</td><td>${fmt(x.standard)}</td><td>${fmt(x.percentile)}</td><td>${flags[i].needsReview?'需進一步檢視智能障礙學生常模':'—'}</td></tr>`).join('')}</tbody></table>`}
+function reportTableID(data,avgs){return `<table><thead><tr><th>分量表</th><th>量表分數</th></tr></thead><tbody>${data.map(x=>`<tr><td>${x.subscale}</td><td>${fmt(x.scale)}</td></tr>`).join('')}</tbody></table><table><thead><tr><th>五個向度</th><th>平均量表分數</th></tr></thead><tbody>${avgs.map(x=>`<tr><td>${x.domain}</td><td>${x.value==null?'—':x.value.toFixed(2)}</td></tr>`).join('')}</tbody></table>`}
+
+function hpaReportHTML(){
+  const ver=el('hpaVersion').value;
+  if(!ver || !hpaRules[ver]) return '<div class="status neutral">尚未輸入國民健康署兒童發展篩檢結果。</div>';
+  const rule=hpaRules[ver];
+  const rows=[
+    ['粗大動作','hpaGross','gross'],
+    ['精細動作','hpaFine','fine'],
+    ['認知語言','hpaCog','cog'],
+    ['社會發展','hpaSocial','social']
+  ];
+  let anyAb=false, allFull=true, complete=true;
+  const body=rows.map(([name,id,key])=>{
+    const val=el(id).value, r=rule[key];
+    let result='—';
+    if(val===''){complete=false;allFull=false;}
+    else if(Number(val)<r.cutoff){result='異常';anyAb=true;allFull=false;}
+    else if(Number(val)>=r.max){result='滿分';}
+    else{result='通過，未達滿分';allFull=false;}
+    return `<tr><td>${name}</td><td>${fmt(val)}</td><td>通過 ≥ ${r.cutoff}</td><td>${r.max}</td><td>${result}</td></tr>`;
+  }).join('');
+  let overall='尚未完成四個發展面向';
+  if(complete){
+    overall=anyAb?'任一發展面向異常（深灰色區）':(allFull?'全部發展面向均達滿分（白色區）':'任一發展面向通過，但未達滿分（淺灰色區）');
+  }
+  const rec=el('hpaRecommendation').value || '尚未選擇';
+  return `<p><b>使用版本：</b>${rule.label}</p><table><thead><tr><th>發展面向</th><th>得分</th><th>切截分數</th><th>最高分</th><th>結果</th></tr></thead><tbody>${body}</tbody></table><div class="status ${anyAb?'warn':(complete&&allFull?'ok':'neutral')}">${overall}</div><p><b>治療／追蹤建議：</b>${esc(rec)}</p>`;
+}
+function taipeiReportHTML(){
+  const ver=el('tpVersion').value;
+  const count=el('tpShadedCount').value, star=el('tpStarHit').value, other=el('tpOtherConcern').value;
+  if(!ver || count==='' || !star || !other) return '<div class="status neutral">尚未輸入完整臺北市發展里程檢核摘要。</div>';
+  const need=Number(count)>=2 || star==='yes' || other==='yes';
+  return `<p><b>使用版本：</b>臺北市 ${ver} 歲發展里程檢核表</p>
+  <table><thead><tr><th>網底答案題數</th><th>★題命中網底</th><th>其他不尋常功能或行為</th></tr></thead>
+  <tbody><tr><td>${esc(count)}</td><td>${star==='yes'?'是':'否'}</td><td>${other==='yes'?'是':'否'}</td></tr></tbody></table>
+  <div class="status ${need?'warn':'ok'}">${need?'符合需進一步檢查的條件。':'通過此階段檢測；仍應持續追蹤發展情形。'}</div>`;
+}
+function generateReport(){
+  if(!validate())return false;
+  const age=calcAge();
+  const g=getGeneral(), idd=getID(), avgs=getAverages();
+  const asqAge=el('asqAge').value, asqScore=el('asqScore').value, cutoff=asqAge?cutoffs[asqAge]:'';
+  let asqText='尚未輸入完整 ASQ:SE-2-TC 結果。', asqClass='neutral';
+  if(asqAge&&asqScore!==''){
+    if(Number(asqScore)>=Number(cutoff)){asqText=`${asqAge}個月版本總分 ${asqScore}，達到或高於切截分數 ${cutoff}。`;asqClass='warn'}
+    else{asqText=`${asqAge}個月版本總分 ${asqScore}，低於切截分數 ${cutoff}。`;asqClass='ok'}
+  }
+  const body=`
+    <h2 style="margin-top:0">一、基本資料</h2>
+    <div class="meta">
+      <div><b>個案暱稱</b><br>${esc(el('nickname').value)}</div>
+      <div><b>評量者</b><br>${esc(el('assessor').value)}</div>
+      <div><b>評量日期</b><br>${esc(el('assessDate').value)}</div>
+      <div><b>實足月齡</b><br>${age.totalMonths} 個月（${age.y}歲${age.m}月${age.d}日）</div>
+      <div><b>性別／年段</b><br>${esc(el('sex').value)}／${esc(gradeLabel())}</div>
+      <div><b>教師熟悉時間</b><br>${esc(el('familiarNum').value)} ${esc(el('familiarUnit').value)}</div>
+      <div><b>早療／特教服務</b><br>${esc(el('service').value)}</div>
+      <div style="grid-column:span 2"><b>評量原因或主要關切</b><br>${esc(el('concern').value)}</div>
+    </div>
+
+    <h2 style="margin-top:18px">二、評量結果</h2>
+    <h3>A. 國民健康署兒童發展篩檢量表</h3>
+    ${hpaReportHTML()}
+    <h3 style="margin-top:18px">B. 社會適應表現檢核表</h3>
+    <h3>一般學生常模</h3>
+    ${reportTableGeneral(g)}
+    ${(()=>{const hits=getGeneralReview().filter(x=>x.needsReview);return hits.length?`<div class="status warn"><b>需進一步檢視智能障礙學生常模</b><br>${hits.map(x=>`${esc(x.domain)}（${x.reasons.map(esc).join('；')}）`).join('、')}</div>`:''})()}
+    <div class="chartbox"><div class="charttitle">五向度標準分數剖面</div>${makeLineChart(domains,g.map(x=>x.standard))}</div>
+    <h3>智能障礙學生常模</h3>
+    ${reportTableID(idd,avgs)}
+    <div class="chartbox"><div class="charttitle">五向度平均量表分數</div>${makeLineChart(domains,avgs.map(x=>x.value==null?null:Number(x.value.toFixed(2))))}</div>
+    <h3 style="margin-top:18px">C. ASQ:SE-2-TC</h3>
+    <div class="status ${asqClass}">${asqText}</div>
+    <h3 style="margin-top:18px">D. 臺北市學前兒童發展里程檢核（補充）</h3>
+    ${taipeiReportHTML()}
+
+    <h2 style="margin-top:22px">三、跨評量整合</h2>
+    <p>${esc(el('integration').value).replace(/\n/g,'<br>')}</p>
+
+    <h2 style="margin-top:22px">四、幼兒優勢與教育需求</h2>
+    <h3>幼兒優勢</h3>
+    <p>${esc(el('strengths').value).replace(/\n/g,'<br>')}</p>
+    <h3>教育需求</h3>
+    <p>${esc(el('needs').value).replace(/\n/g,'<br>')}</p>
+
+    <h2 style="margin-top:22px">五、尚需蒐集之資料</h2>
+    <ul>${selectedMoreData().map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+
+    <h2 style="margin-top:22px">六、後續建議</h2>
+    <p>${esc(el('recommendations').value).replace(/\n/g,'<br>')}</p>
+    <div class="footer-note">以上「跨評量整合、幼兒優勢與教育需求、尚需蒐集之資料及後續建議」為評量者依資料所做之專業整理，並非系統自動診斷結果。</div>
+  `;
+  el('reportBody').innerHTML=body;
+  el('report').classList.add('show');
+  el('report').scrollIntoView({behavior:'smooth',block:'start'});
+  return true;
+}
+el('generateBtn').addEventListener('click',generateReport);
+
+function createSubmissionId(){
+  const now=new Date();
+  const y=now.getFullYear();
+  const m=String(now.getMonth()+1).padStart(2,'0');
+  const d=String(now.getDate()).padStart(2,'0');
+  let randomPart='';
+  try{
+    const bytes=new Uint8Array(3);
+    crypto.getRandomValues(bytes);
+    randomPart=Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+  }catch(e){
+    randomPart=Math.random().toString(36).slice(2,8).toUpperCase();
+  }
+  return `PAI-${y}${m}${d}-${randomPart}`;
+}
+
+function getHPAOverallResult(){
+  const ver=el('hpaVersion').value;
+  if(!ver || !hpaRules[ver]) return '';
+  const rule=hpaRules[ver];
+  const vals={
+    gross:el('hpaGross').value,
+    fine:el('hpaFine').value,
+    cog:el('hpaCog').value,
+    social:el('hpaSocial').value
+  };
+  if(Object.values(vals).some(v=>v==='')) return '';
+  let anyAbnormal=false, allFull=true;
+  Object.entries(vals).forEach(([key,v])=>{
+    const n=Number(v), r=rule[key];
+    if(n<r.cutoff){ anyAbnormal=true; allFull=false; }
+    else if(n<r.max){ allFull=false; }
+  });
+  if(anyAbnormal) return '任一發展面向異常（深灰色區）';
+  if(allFull) return '全部發展面向均達滿分（白色區）';
+  return '任一發展面向通過，但未達滿分（淺灰色區）';
+}
+
+function getTaipeiResult(){
+  const count=el('tpShadedCount').value;
+  const star=el('tpStarHit').value;
+  const other=el('tpOtherConcern').value;
+  if(count==='' || !star || !other) return '';
+  const need=Number(count)>=2 || star==='yes' || other==='yes';
+  return need ? '符合需進一步檢查的條件' : '通過此階段檢測；仍應持續追蹤發展情形';
+}
+
+function buildPayload(submissionId){
+  const age=calcAge();
+  const g=getGeneral();
+  const idd=getID();
+  const avgs=getAverages();
+  const flags=getGeneralReview();
+  const reviewHits=flags.filter(x=>x.needsReview);
+  const asqAge=el('asqAge').value;
+  const asqScore=el('asqScore').value;
+  const asqCutoff=asqAge ? cutoffs[asqAge] : '';
+  const asqResult=(asqAge && asqScore!=='')
+    ? (Number(asqScore)>=Number(asqCutoff)
+        ? '達到或高於切截分數'
+        : '低於切截分數')
+    : '';
+
+  return {
+    submissionId,
+
+    nickname:el('nickname').value.trim(),
+    assessor:el('assessor').value.trim(),
+    assessmentDate:el('assessDate').value,
+    ageMonths:age ? age.totalMonths : '',
+    ageDisplay:age ? `${age.y}歲${age.m}月${age.d}日` : '',
+    gender:el('sex').value,
+    grade:el('grade').value,
+    gradeOther:el('grade').value==='其他' ? el('gradeOther').value.trim() : '',
+    teacherFamiliarity:`${el('familiarNum').value} ${el('familiarUnit').value}`.trim(),
+    earlyInterventionService:el('service').value,
+    assessmentConcern:el('concern').value.trim(),
+
+    hpaVersion:el('hpaVersion').value,
+    hpaGrossMotor:numOrBlank(el('hpaGross').value),
+    hpaFineMotor:numOrBlank(el('hpaFine').value),
+    hpaCognitiveLanguage:numOrBlank(el('hpaCog').value),
+    hpaSocialDevelopment:numOrBlank(el('hpaSocial').value),
+    hpaOverallResult:getHPAOverallResult(),
+    hpaRecommendation:el('hpaRecommendation').value,
+
+    adaptSelfCareComposite:numOrBlank(g[0].composite),
+    adaptSelfCareStandard:numOrBlank(g[0].standard),
+    adaptSelfCarePercentile:numOrBlank(g[0].percentile),
+    adaptMotorComposite:numOrBlank(g[1].composite),
+    adaptMotorStandard:numOrBlank(g[1].standard),
+    adaptMotorPercentile:numOrBlank(g[1].percentile),
+    adaptLanguageComposite:numOrBlank(g[2].composite),
+    adaptLanguageStandard:numOrBlank(g[2].standard),
+    adaptLanguagePercentile:numOrBlank(g[2].percentile),
+    adaptSocialComposite:numOrBlank(g[3].composite),
+    adaptSocialStandard:numOrBlank(g[3].standard),
+    adaptSocialPercentile:numOrBlank(g[3].percentile),
+    adaptAcademicComposite:numOrBlank(g[4].composite),
+    adaptAcademicStandard:numOrBlank(g[4].standard),
+    adaptAcademicPercentile:numOrBlank(g[4].percentile),
+    adaptNeedIDNorm:reviewHits.length
+      ? reviewHits.map(x=>`${x.domain}（${x.reasons.join('；')}）`).join('、')
+      : '否',
+
+    idEating:numOrBlank(idd[0].scale),
+    idDressing:numOrBlank(idd[1].scale),
+    idHygieneSafety:numOrBlank(idd[2].scale),
+    idMotor:numOrBlank(idd[3].scale),
+    idMobility:numOrBlank(idd[4].scale),
+    idLanguage:numOrBlank(idd[5].scale),
+    idCommunication:numOrBlank(idd[6].scale),
+    idSocial:numOrBlank(idd[7].scale),
+    idEmotion:numOrBlank(idd[8].scale),
+    idLiteracy:numOrBlank(idd[9].scale),
+    idMath:numOrBlank(idd[10].scale),
+    idIntegrated:numOrBlank(idd[11].scale),
+
+    idSelfCareMean:avgs[0].value==null ? '' : Number(avgs[0].value.toFixed(2)),
+    idMotorMean:avgs[1].value==null ? '' : Number(avgs[1].value.toFixed(2)),
+    idLanguageMean:avgs[2].value==null ? '' : Number(avgs[2].value.toFixed(2)),
+    idSocialMean:avgs[3].value==null ? '' : Number(avgs[3].value.toFixed(2)),
+    idAcademicMean:avgs[4].value==null ? '' : Number(avgs[4].value.toFixed(2)),
+
+    asqVersion:asqAge,
+    asqTotal:numOrBlank(asqScore),
+    asqCutoff:numOrBlank(asqCutoff),
+    asqResult,
+
+    taipeiVersion:el('tpVersion').value,
+    taipeiShadedCount:numOrBlank(el('tpShadedCount').value),
+    taipeiStarFlag:el('tpStarHit').value==='yes' ? '是' : (el('tpStarHit').value==='no' ? '否' : ''),
+    taipeiOtherConcern:el('tpOtherConcern').value==='yes' ? '是' : (el('tpOtherConcern').value==='no' ? '否' : ''),
+    taipeiResult:getTaipeiResult(),
+
+    integration:el('integration').value.trim(),
+    strengths:el('strengths').value.trim(),
+    educationalNeeds:el('needs').value.trim(),
+    additionalDataNeeded:selectedMoreData(),
+    recommendations:el('recommendations').value.trim(),
+
+    // 為與已部署的 Apps Script 相容；知情同意是本研究既定收案程序，學生端不再重複勾選。
+    consentConfirmed:true,
+    // 送出前會以確認視窗提醒避免輸入直接識別資料。
+    deidentifiedConfirmed:true
+  };
+}
+
+async function submitAssessmentData(){
+  if(submitted){
+    alert(`本頁資料已送出，提交編號：${currentSubmissionId}`);
+    return;
+  }
+  if(!el('report').classList.contains('show')){
+    const ok=generateReport();
+    if(!ok) return;
+  }else if(!validate()){
+    return;
+  }
+
+  if(!currentSubmissionId) currentSubmissionId=createSubmissionId();
+  const payload=buildPayload(currentSubmissionId);
+  const btn=el('reportSubmitBtn');
+  const box=el('reportSubmitStatus');
+  btn.disabled=true;
+  btn.textContent='送出中…';
+  box.style.display='block';
+  box.className='status neutral';
+  box.textContent=`正在送出資料，提交編號：${currentSubmissionId}`;
+
+  try{
+    try{
+      await fetch(SUBMIT_ENDPOINT,{
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(payload)
+      });
+    }catch(fetchErr){
+      if(navigator.sendBeacon){
+        const beaconOK=navigator.sendBeacon(
+          SUBMIT_ENDPOINT,
+          new Blob([JSON.stringify(payload)],{type:'text/plain;charset=utf-8'})
+        );
+        if(!beaconOK) throw fetchErr;
+      }else{
+        throw fetchErr;
+      }
+    }
+    submitted=true;
+    box.className='status ok';
+    box.innerHTML=`資料已送出。<br><b>提交編號：${esc(currentSubmissionId)}</b><br><span class="mini">請保留此編號，以便後續核對。</span>`;
+    const reportBox=el('reportSubmission');
+    reportBox.style.display='block';
+    reportBox.className='status ok';
+    reportBox.innerHTML=`資料已送出｜提交編號：<b>${esc(currentSubmissionId)}</b>`;
+    btn.textContent='已送出資料';
+    btn.disabled=true;
+  }catch(err){
+    box.className='status warn';
+    box.innerHTML=`送出時發生問題，請檢查網路後再試一次。若目前是在內嵌預覽畫面，請將 HTML 下載後以瀏覽器開啟，或部署至 GitHub Pages 後再送出。<br><span class="mini">${esc(err && err.message ? err.message : String(err))}</span>`;
+    btn.textContent='確認無誤，送出資料';
+    btn.disabled=false;
+  }
+}
+
+function printReport(){
+  if(!el('report').classList.contains('show')){
+    const ok=generateReport();
+    if(!ok) return;
+  }
+  setTimeout(()=>window.print(),50);
+}
+
+el('reportSubmitBtn').addEventListener('click',submitAssessmentData);
+el('reportPrintBtn').addEventListener('click',printReport);
+
+el('resetBtn').addEventListener('click',()=>{if(confirm('確定要清除目前所有輸入資料嗎？'))location.reload();});
+updateAverages();
+updateGeneralReview();
+updateHPA();
+updateTaipei();
+</script>
+</body>
+</html>
