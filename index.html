@@ -125,6 +125,7 @@
         <div><label class="req">7. 教師熟悉幼兒時間</label><div style="display:flex;gap:8px"><input id="familiarNum" type="number" min="0" step="1" placeholder="例如 8" /><select id="familiarUnit" style="max-width:110px"><option>週</option><option>月</option><option>年</option></select></div></div>
         <div><label class="req">8. 是否接受早療／特教服務</label><select id="service"><option value="">請選擇</option><option>否</option><option>接受早療服務</option><option>接受特殊教育服務</option><option>兩者皆有</option></select></div>
         <div style="grid-column:1/-1"><label class="req">9. 評量原因或目前主要關切（至少10字）</label><textarea id="concern" minlength="10" maxlength="300" placeholder="請簡要說明目前最關切的發展、學習、適應或社會情緒表現。"></textarea><div class="charcount"><span id="concernCount">0</span>/300</div></div>
+        <div><label class="req">10. 是否為期末幼兒個案</label><select id="finalCase"><option value="">請選擇</option><option value="yes">是</option><option value="no">否</option></select><div class="mini">選擇「是」時，才需完成 E. 綜合評量與專業判斷。</div></div>
       </div>
     </section>
 
@@ -205,6 +206,7 @@
       <h2>C. ASQ:SE-2-TC</h2>
       <p class="note">切截分數依你提供的「ASQ:SE-2 繁體中文版切截分數」表設定。正式研究與臨床／教育判讀仍應以正式中文版手冊為準。</p>
       <div class="grid3">
+        <div><label class="req">填寫者身分</label><select id="asqRespondent"><option value="">請選擇</option><option value="父母親">父母親</option><option value="老師">老師</option><option value="其他">其他</option></select><div id="asqRespondentOtherWrap" class="hidden" style="margin-top:8px"><input id="asqRespondentOther" maxlength="50" placeholder="請填寫填寫者身分，例如：祖母、保母" /></div></div>
         <div><label class="req">使用年齡層版本</label><select id="asqAge" required><option value="">請選擇</option><option value="2">2個月</option><option value="6">6個月</option><option value="18">18個月</option><option value="24">24個月</option><option value="30">30個月</option><option value="36">36個月</option><option value="48">48個月</option><option value="60">60個月</option></select></div>
         <div><label class="req">ASQ:SE-2-TC 總分</label><input id="asqScore" type="number" min="0" step="1" required /></div>
         <div><label>中文版切截分數</label><input id="asqCutoff" class="readonly" readonly /></div>
@@ -253,7 +255,7 @@
       <details class="ref" id="tp5Details"><summary>查看臺北市 5 歲發展里程檢核表</summary><img class="refimg" alt="臺北市5歲發展里程檢核表" src="assets/taipei_age5.png"></details>
     </section>
 
-    <section class="panel">
+    <section class="panel hidden" id="professionalSection">
       <h2>E. 綜合評量與專業判斷</h2>
       <p class="integration-note">以下內容由評量者依前述資料自行整合與判斷，系統不會自動替幼兒下診斷或產生教育結論。請以評量證據為基礎，說明不同資料來源的一致與不一致，並提出後續需要補充的資訊與支持建議。</p>
 
@@ -600,6 +602,19 @@ function updateASQ(){
 }
 el('asqAge').addEventListener('change',updateASQ);el('asqScore').addEventListener('input',updateASQ);
 
+function updateASQRespondent(){
+  const isOther=el('asqRespondent').value==='其他';
+  el('asqRespondentOtherWrap').classList.toggle('hidden',!isOther);
+  if(!isOther) el('asqRespondentOther').value='';
+}
+el('asqRespondent').addEventListener('change',updateASQRespondent);
+
+function isFinalCase(){return el('finalCase').value==='yes'}
+function updateFinalCaseUI(){
+  el('professionalSection').classList.toggle('hidden',!isFinalCase());
+}
+el('finalCase').addEventListener('change',updateFinalCaseUI);
+
 const professionalTextFields=[
   ['strengths','strengthsCount'],['needs','needsCount'],['recommendations','recommendationsCount']
 ];
@@ -647,7 +662,7 @@ function requireNumericFields(selector, sectionName){
 }
 
 function validate(){
-  const required=[['nickname','個案暱稱'],['assessor','評量者'],['assessDate','評量日期'],['birthDate','出生日期'],['sex','性別'],['grade','就讀年段'],['familiarNum','教師熟悉幼兒時間'],['service','是否接受早療／特教服務'],['concern','評量原因或目前主要關切']];
+  const required=[['nickname','個案暱稱'],['assessor','評量者'],['assessDate','評量日期'],['birthDate','出生日期'],['sex','性別'],['grade','就讀年段'],['familiarNum','教師熟悉幼兒時間'],['service','是否接受早療／特教服務'],['concern','評量原因或目前主要關切'],['finalCase','是否為期末幼兒個案']];
   for(const [id,name] of required){if(!el(id).value.trim()){alert(`請填寫：${name}`);el(id).focus();return false}}
   if(el('grade').value==='其他' && !el('gradeOther').value.trim()){alert('就讀年段選擇「其他」時，請填寫實際年段。');el('gradeOther').focus();return false}
   if(el('concern').value.trim().length<10){alert('「評量原因或目前主要關切」至少需10個字。');el('concern').focus();return false}
@@ -664,6 +679,8 @@ function validate(){
   if(badPerc){alert('一般學生常模的百分等級須介於 0–100。');badPerc.focus();return false}
   if(!requireNumericFields('#idNormTable tbody input','社會適應表現檢核表智能障礙學生常模')) return false;
 
+  if(!el('asqRespondent').value){alert('請選擇 ASQ:SE-2-TC 填寫者身分。');el('asqRespondent').focus();return false}
+  if(el('asqRespondent').value==='其他' && !el('asqRespondentOther').value.trim()){alert('ASQ:SE-2-TC 填寫者身分選擇「其他」時，請填寫實際身分。');el('asqRespondentOther').focus();return false}
   if(!el('asqAge').value){alert('請選擇 ASQ:SE-2-TC 使用年齡層版本。');el('asqAge').focus();return false}
   if(el('asqScore').value===''){alert('請填寫 ASQ:SE-2-TC 總分。');el('asqScore').focus();return false}
 
@@ -674,13 +691,15 @@ function validate(){
     return false;
   }
 
-  if(!el('integration').value.trim()){alert('請填寫「三、跨評量整合」。');el('integration').focus();return false}
-  if(el('strengths').value.trim().length<10){alert('「幼兒優勢」至少需10個字。');el('strengths').focus();return false}
-  if(el('needs').value.trim().length<10){alert('「教育需求」至少需10個字。');el('needs').focus();return false}
-  const moreData=selectedMoreData();
-  if(moreData.length===0){alert('「五、尚需蒐集之資料」請至少選擇一項，或勾選「目前暫無需補充資料」。');return false}
-  if(el('more_other').checked && !el('moreOtherText').value.trim()){alert('勾選「其他」時，請填寫其他尚需蒐集之資料。');el('moreOtherText').focus();return false}
-  if(el('recommendations').value.trim().length<10){alert('「六、後續建議」至少需10個字。');el('recommendations').focus();return false}
+  if(isFinalCase()){
+    if(!el('integration').value.trim()){alert('期末幼兒個案請填寫「三、跨評量整合」。');el('integration').focus();return false}
+    if(el('strengths').value.trim().length<10){alert('期末幼兒個案的「幼兒優勢」至少需10個字。');el('strengths').focus();return false}
+    if(el('needs').value.trim().length<10){alert('期末幼兒個案的「教育需求」至少需10個字。');el('needs').focus();return false}
+    const moreData=selectedMoreData();
+    if(moreData.length===0){alert('期末幼兒個案的「五、尚需蒐集之資料」請至少選擇一項，或勾選「目前暫無需補充資料」。');return false}
+    if(el('more_other').checked && !el('moreOtherText').value.trim()){alert('勾選「其他」時，請填寫其他尚需蒐集之資料。');el('moreOtherText').focus();return false}
+    if(el('recommendations').value.trim().length<10){alert('期末幼兒個案的「六、後續建議」至少需10個字。');el('recommendations').focus();return false}
+  }
   return true;
 }
 function reportTableGeneral(g){const flags=getGeneralReview();return `<table><thead><tr><th>向度</th><th>組合分數</th><th>標準分數</th><th>百分等級</th><th>提示</th></tr></thead><tbody>${g.map((x,i)=>`<tr class="${flags[i].needsReview?'needs-id-review':''}"><td>${x.domain}</td><td>${fmt(x.composite)}</td><td>${fmt(x.standard)}</td><td>${fmt(x.percentile)}</td><td>${flags[i].needsReview?'需進一步檢視智能障礙學生常模':'—'}</td></tr>`).join('')}</tbody></table>`}
@@ -743,6 +762,7 @@ function generateReport(){
       <div><b>性別／年段</b><br>${esc(el('sex').value)}／${esc(gradeLabel())}</div>
       <div><b>教師熟悉時間</b><br>${esc(el('familiarNum').value)} ${esc(el('familiarUnit').value)}</div>
       <div><b>早療／特教服務</b><br>${esc(el('service').value)}</div>
+      <div><b>期末幼兒個案</b><br>${isFinalCase()?'是':'否'}</div>
       <div style="grid-column:span 2"><b>評量原因或主要關切</b><br>${esc(el('concern').value)}</div>
     </div>
 
@@ -758,10 +778,12 @@ function generateReport(){
     ${reportTableID(idd,avgs)}
     <div class="chartbox"><div class="charttitle">五向度平均量表分數</div>${makeLineChart(domains,avgs.map(x=>x.value==null?null:Number(x.value.toFixed(2))))}</div>
     <h3 style="margin-top:18px">C. ASQ:SE-2-TC</h3>
+    <p><b>填寫者身分：</b>${esc(asqRespondentLabel())}</p>
     <div class="status ${asqClass}">${asqText}</div>
     <h3 style="margin-top:18px">D. 臺北市學前兒童發展里程檢核（補充）</h3>
     ${taipeiReportHTML()}
 
+    ${isFinalCase() ? `
     <h2 style="margin-top:22px">三、跨評量整合</h2>
     <p>${esc(el('integration').value).replace(/\n/g,'<br>')}</p>
 
@@ -777,6 +799,7 @@ function generateReport(){
     <h2 style="margin-top:22px">六、後續建議</h2>
     <p>${esc(el('recommendations').value).replace(/\n/g,'<br>')}</p>
     <div class="footer-note">以上「跨評量整合、幼兒優勢與教育需求、尚需蒐集之資料及後續建議」為評量者依資料所做之專業整理，並非系統自動診斷結果。</div>
+    ` : ''}
   `;
   el('reportBody').innerHTML=body;
   el('report').classList.add('show');
@@ -832,6 +855,15 @@ function getTaipeiResult(){
   return need ? '符合需進一步檢查的條件' : '通過此階段檢測；仍應持續追蹤發展情形';
 }
 
+function asqRespondentLabel(){
+  const role=el('asqRespondent').value;
+  if(role==='其他'){
+    const other=el('asqRespondentOther').value.trim();
+    return other ? `其他：${other}` : '其他';
+  }
+  return role;
+}
+
 function buildPayload(submissionId){
   const age=calcAge();
   const g=getGeneral();
@@ -862,6 +894,7 @@ function buildPayload(submissionId){
     teacherFamiliarity:`${el('familiarNum').value} ${el('familiarUnit').value}`.trim(),
     earlyInterventionService:el('service').value,
     assessmentConcern:el('concern').value.trim(),
+    isFinalCase:isFinalCase() ? '是' : '否',
 
     hpaVersion:el('hpaVersion').value,
     hpaGrossMotor:numOrBlank(el('hpaGross').value),
@@ -913,6 +946,7 @@ function buildPayload(submissionId){
     asqTotal:numOrBlank(asqScore),
     asqCutoff:numOrBlank(asqCutoff),
     asqResult,
+    asqRespondent:asqRespondentLabel(),
 
     taipeiVersion:el('tpVersion').value,
     taipeiShadedCount:numOrBlank(el('tpShadedCount').value),
@@ -920,11 +954,11 @@ function buildPayload(submissionId){
     taipeiOtherConcern:el('tpOtherConcern').value==='yes' ? '是' : (el('tpOtherConcern').value==='no' ? '否' : ''),
     taipeiResult:getTaipeiResult(),
 
-    integration:el('integration').value.trim(),
-    strengths:el('strengths').value.trim(),
-    educationalNeeds:el('needs').value.trim(),
-    additionalDataNeeded:selectedMoreData(),
-    recommendations:el('recommendations').value.trim(),
+    integration:isFinalCase() ? el('integration').value.trim() : '',
+    strengths:isFinalCase() ? el('strengths').value.trim() : '',
+    educationalNeeds:isFinalCase() ? el('needs').value.trim() : '',
+    additionalDataNeeded:isFinalCase() ? selectedMoreData() : [],
+    recommendations:isFinalCase() ? el('recommendations').value.trim() : '',
 
     // 為與已部署的 Apps Script 相容；知情同意是本研究既定收案程序，學生端不再重複勾選。
     consentConfirmed:true,
@@ -1007,6 +1041,8 @@ updateAverages();
 updateGeneralReview();
 updateHPA();
 updateTaipei();
+updateASQRespondent();
+updateFinalCaseUI();
 </script>
 </body>
 </html>
